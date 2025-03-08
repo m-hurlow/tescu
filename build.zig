@@ -8,12 +8,7 @@ pub fn build(b: *std.Build) void {
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
     // for restricting supported target set are available.
-    const cross_target = b.resolveTargetQuery(.{
-            .abi = .eabi,
-            .cpu_arch = .thumb,
-            .cpu_model = .{ .explicit = &std.Target.arm.cpu.cortex_m0plus },
-            .os_tag = .freestanding
-        });
+    const cross_target = b.resolveTargetQuery(.{ .abi = .eabi, .cpu_arch = .thumb, .cpu_model = .{ .explicit = &std.Target.arm.cpu.cortex_m0plus }, .os_tag = .freestanding });
 
     // Standard optimization options allow the person running `zig build` to select
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
@@ -24,26 +19,35 @@ pub fn build(b: *std.Build) void {
         .name = "tescu_native",
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
-        .root_source_file = b.path("src/root.zig"),
-        .target = b.host,
+        .root_source_file = b.path("src-zig/root.zig"),
+        .target = b.graph.host,
         .optimize = optimize,
     });
+    native_lib.addIncludePath(b.path("src-c/"));
+    const n_options = b.addOptions();
+    n_options.addOption(bool, "pico", false);
+    native_lib.root_module.addOptions("config", n_options);
 
     const native_exe = b.addExecutable(.{
         .name = "tescu_native",
-        .root_source_file = b.path("src/main.zig"),
-        .target = b.host,
+        .root_source_file = b.path("src-zig/main.zig"),
+        .target = b.graph.host,
         .optimize = optimize,
     });
+    native_exe.root_module.addOptions("config", n_options);
 
     const cross_lib = b.addStaticLibrary(.{
         .name = "tescu",
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
-        .root_source_file = b.path("src/root.zig"),
+        .root_source_file = b.path("src-zig/root.zig"),
         .target = cross_target,
         .optimize = optimize,
     });
+    cross_lib.addIncludePath(b.path("src-c/"));
+    const c_options = b.addOptions();
+    c_options.addOption(bool, "pico", true);
+    cross_lib.root_module.addOptions("config", c_options);
 
     b.installArtifact(native_lib);
     b.installArtifact(native_exe);
@@ -84,16 +88,16 @@ pub fn build(b: *std.Build) void {
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
     const lib_unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/root.zig"),
-        .target = b.host,
+        .root_source_file = b.path("src-zig/root.zig"),
+        .target = b.graph.host,
         .optimize = optimize,
     });
 
     const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
 
     const exe_unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/main.zig"),
-        .target = b.host,
+        .root_source_file = b.path("src-zig/main.zig"),
+        .target = b.graph.host,
         .optimize = optimize,
     });
 

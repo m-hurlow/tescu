@@ -26,6 +26,7 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
 }
 
 extern int32_t add(int32_t a, int32_t b);
+extern void main_loop();
 
 int main()
 {
@@ -55,9 +56,9 @@ int main()
     // Timer example code - This example fires off the callback after 2000ms
     add_alarm_in_ms(2000, alarm_callback, NULL, false);
     // For more examples of timer use see https://github.com/raspberrypi/pico-examples/tree/master/timer
+   
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
-    while (true) {
-        printf("Hello, world! %d\n", add(10, 10));
-        sleep_ms(1000);
-    }
+    main_loop();
 }

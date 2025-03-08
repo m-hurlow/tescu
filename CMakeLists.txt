@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(tescu tescu.c )
+add_executable(tescu src-c/tescu.c src-c/hal.c src-c/hal.h)
 
 pico_set_program_name(tescu "tescu")
 pico_set_program_version(tescu "0.1")
