@@ -26,7 +26,7 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
 }
 
 extern int32_t add(int32_t a, int32_t b);
-extern void main_loop();
+extern void mainLoop();
 
 int main()
 {
@@ -60,5 +60,5 @@ int main()
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
-    main_loop();
+    mainLoop();
 }

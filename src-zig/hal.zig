@@ -1,9 +1,6 @@
-const std = @import("std");
+const config = @import("config");
 
-pub fn sleep(time: u32) void {
-    std.Thread.sleep(time * 1000 * 1000);
-}
-
-pub fn set_led(state: bool) void {
-    std.debug.print("led {s}\n", .{if (state) "on" else "off"});
-}
+//Import a different HAL library whether we are on desktop or the Pico.
+pub const hal = if (config.pico) @cImport({
+    @cInclude("hal.h");
+}) else @import("hal_impl.zig");
