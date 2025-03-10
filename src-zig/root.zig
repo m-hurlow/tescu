@@ -16,6 +16,14 @@ fn ledOff(queue: *EventQueue) void {
     events.add_after_delay(queue, ledOn, 1000 * 1000);
 }
 
+fn read_outlet_temp(queue: *EventQueue) void {
+    const temp = hal.read_thermocouple(0);
+    hal.print("Outlet temp: ");
+    hal.print_u64(@intFromFloat(temp));
+    hal.print("\n");
+    events.add_after_delay(queue, read_outlet_temp, 2500 * 1000);
+}
+
 pub export fn mainLoop() void {
     var buffer: [4096]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&buffer);
@@ -24,12 +32,9 @@ pub export fn mainLoop() void {
     var queue = EventQueue.init(alloc, {});
     defer queue.deinit();
 
-    //Add our starter event
-    const starter = Event{
-        .time = hal.get_time(),
-        .callback = ledOn,
-    };
-    queue.add(starter) catch {};
+    //Add our starter events
+    events.add_after_delay(&queue, ledOn, 0);
+    events.add_after_delay(&queue, read_outlet_temp, 2500 * 1000);
 
     while (true) {
         //The code is event-driven; if there are no events in the queue,

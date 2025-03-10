@@ -10,4 +10,6 @@ void print(const char* msg);
 void print_u64(uint64_t val);
 uint64_t get_time();
 
+float read_thermocouple(uint8_t thermocouple);
+
 #endif
