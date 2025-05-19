@@ -2,7 +2,7 @@
 #include "hal.h"
 #include "pico/stdlib.h"
 
-#define todo(msg) print(msg); while (true) {};
+#define todo(msg) while (true) {print(msg); sleep_ms(1000);};
  
 void sleep(uint64_t time) {
     sleep_us(time);
