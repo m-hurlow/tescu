@@ -3,6 +3,10 @@
 #include "pico/stdlib.h"
 
 #define todo(msg) print(msg); while (true) {};
+
+void init() {
+    //TODO: initialise ESC
+}
  
 void sleep(uint64_t time) {
     sleep_us(time);
@@ -25,6 +29,14 @@ uint64_t get_time() {
 }
 
 float read_thermocouple(uint8_t thermocouple) {
-    todo("Thermocouple read not implemented");
+    //todo("Thermocouple read not implemented");
     return 0.0;
+}
+
+uint16_t get_char() {
+    return stdio_getchar_timeout_us(0);
+}
+
+void set_fan_speed(uint16_t speed) {
+    //TODO: PWM control of ESC
 }

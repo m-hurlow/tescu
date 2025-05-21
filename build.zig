@@ -28,6 +28,11 @@ pub fn build(b: *std.Build) void {
     n_options.addOption(bool, "pico", false);
     native_lib.root_module.addOptions("config", n_options);
 
+    const raylib_dep = b.dependency("raylib_zig", .{
+        .target = b.graph.host,
+        .optimize = optimize,
+    });
+
     const native_exe = b.addExecutable(.{
         .name = "tescu_native",
         .root_source_file = b.path("src-zig/main.zig"),
@@ -35,6 +40,16 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     native_exe.root_module.addOptions("config", n_options);
+
+    const raylib = raylib_dep.module("raylib"); // main raylib module
+    const raygui = raylib_dep.module("raygui"); // raygui module
+    const raylib_artifact = raylib_dep.artifact("raylib"); // raylib C library
+    native_exe.linkLibrary(raylib_artifact);
+    native_exe.root_module.addImport("raylib", raylib);
+    native_exe.root_module.addImport("raygui", raygui);
+    native_lib.linkLibrary(raylib_artifact);
+    native_lib.root_module.addImport("raylib", raylib);
+    native_lib.root_module.addImport("raygui", raygui);
 
     const cross_lib = b.addStaticLibrary(.{
         .name = "tescu",

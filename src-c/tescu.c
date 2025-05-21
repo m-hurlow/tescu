@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 #include "hardware/i2c.h"
@@ -31,6 +32,16 @@ extern void mainLoop();
 int main()
 {
     stdio_init_all();
+
+    //Wait for a command before proceeding
+    sleep_ms(10000);
+    printf("Command: ");
+    char command[256];
+    scanf("%s", command);
+    while (strcmp(command, "go")) {
+        printf("Expected \"go\", got \"%s\"\n", command);
+        scanf("%s", command);
+    }
 
     // SPI initialisation. This example will use SPI at 1MHz.
     spi_init(SPI_PORT, 1000*1000);

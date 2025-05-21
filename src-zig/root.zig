@@ -1,4 +1,5 @@
 const std = @import("std");
+const config = @import("config");
 
 const events = @import("events.zig");
 const EventQueue = events.EventQueue;
@@ -6,23 +7,7 @@ const Event = events.Event;
 
 const hal = @import("hal.zig").hal;
 
-fn ledOn(queue: *EventQueue) void {
-    hal.set_led(true);
-    events.add_after_delay(queue, ledOff, 1000 * 1000);
-}
-
-fn ledOff(queue: *EventQueue) void {
-    hal.set_led(false);
-    events.add_after_delay(queue, ledOn, 1000 * 1000);
-}
-
-fn read_outlet_temp(queue: *EventQueue) void {
-    const temp = hal.read_thermocouple(0);
-    hal.print("Outlet temp: ");
-    hal.print_u64(@intFromFloat(temp));
-    hal.print("\n");
-    events.add_after_delay(queue, read_outlet_temp, 2500 * 1000);
-}
+const processes = @import("processes/root.zig");
 
 pub export fn mainLoop() void {
     var buffer: [4096]u8 = undefined;
@@ -32,9 +17,12 @@ pub export fn mainLoop() void {
     var queue = EventQueue.init(alloc, {});
     defer queue.deinit();
 
+    hal.init(&queue);
+
     //Add our starter events
-    events.add_after_delay(&queue, ledOn, 0);
-    events.add_after_delay(&queue, read_outlet_temp, 2500 * 1000);
+    events.add_after_delay(&queue, processes.utility.ledOn, 0);
+    events.add_after_delay(&queue, processes.utility.read_outlet_temp, 1000 * 1000);
+    events.add_after_delay(&queue, processes.fan_control, 0);
 
     while (true) {
         //The code is event-driven; if there are no events in the queue,
