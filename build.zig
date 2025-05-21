@@ -40,6 +40,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     native_exe.root_module.addOptions("config", n_options);
+    native_exe.addIncludePath(b.path("src-c/"));
 
     const raylib = raylib_dep.module("raylib"); // main raylib module
     const raygui = raylib_dep.module("raygui"); // raygui module

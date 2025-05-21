@@ -3,6 +3,12 @@ const rl = @import("raylib");
 const events = @import("events.zig");
 const EventQueue = events.EventQueue;
 
+const c_hal = @cImport({
+    @cInclude("hal.h");
+});
+
+pub const TcData = c_hal.TcData;
+
 const HistoryBuffer = struct {
     current: u9,
     buf: [512]f32,
@@ -58,6 +64,10 @@ pub fn print_u64(val: u64) void {
     std.debug.print("{}", .{val});
 }
 
+pub fn print_f32(val: f32) void {
+    std.debug.print("{}", .{val});
+}
+
 pub fn get_time() u64 {
     return @intCast(std.time.microTimestamp());
 }
@@ -70,18 +80,18 @@ const SIM_STATE = struct {
     var history: HistoryBuffer = HistoryBuffer.init();
 };
 
-pub fn read_thermocouple(thermocouple: u8) f32 {
+pub fn read_thermocouple(thermocouple: u8) TcData {
     switch (thermocouple) {
         0 => {
             //Use previous speed values to implement a delay from changing speed to observing a change in temperature
             const prev_vel = SIM_STATE.history.buf[SIM_STATE.history.current -% @as(u9, @intFromFloat(@floor(1.0 / @as(f32, @floatFromInt(timestep)))))];
             const air_mass_flow = 100000.0 / (287 * SIM_STATE.air_temp) * prev_vel * 0.25 * std.math.pi * 0.075 * 0.075;
             const output_temp = (air_mass_flow * SIM_STATE.air_temp + SIM_STATE.exhaust_mass_flow * SIM_STATE.exhaust_temp) / (air_mass_flow + SIM_STATE.exhaust_mass_flow);
-            return output_temp;
+            return TcData{ .tc_temp = @intFromFloat(output_temp / 0.25), .int_temp = 400 };
         },
         else => std.debug.print("Unknown thermocouple {}", .{thermocouple}),
     }
-    return 0.0;
+    return TcData{};
 }
 
 pub fn get_char() u16 {

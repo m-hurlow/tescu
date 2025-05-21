@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "hal.h"
 #include "pico/stdlib.h"
+#include "hardware/spi.h"
+
+#include "pins.h"
 
 #define todo(msg) print(msg); while (true) {};
 
@@ -24,13 +27,33 @@ void print_u64(uint64_t val) {
     printf("%lld", val);
 }
 
+void print_f32(float val) {
+    printf("%.2f", val);
+}
+
 uint64_t get_time() {
     return time_us_64();
 }
 
-float read_thermocouple(uint8_t thermocouple) {
-    //todo("Thermocouple read not implemented");
-    return 0.0;
+struct TcData read_thermocouple(uint8_t thermocouple) {
+    // Set CS low and wait for a small period
+    gpio_put(PIN_TC_CS, 0);
+    sleep_ms(1);
+
+    // Read 32 bits from the thermocouple amp
+    uint8_t buffer[4];
+    spi_read_blocking(SPI_PORT, 0x00, buffer, 4);
+    gpio_put(PIN_TC_CS, 1);
+    uint32_t tc_bits = ((uint32_t)buffer[0] << 24) | ((uint32_t)buffer[1] << 16) | ((uint32_t)buffer[2] << 8) | (uint32_t)buffer[3];
+
+    struct TcData data;
+    data.oc_fault = (tc_bits & 1) == 1;
+    data.scg_fault = ((tc_bits >> 1) & 1) == 1;
+    data.scv_fault = ((tc_bits >> 2) & 1)  == 1;
+    data.int_temp = (tc_bits >> 4) & 0xfff;
+    data.fault = ((tc_bits >> 16) & 1) == 1;
+    data.tc_temp = tc_bits >> 18;
+    return data;
 }
 
 uint16_t get_char() {

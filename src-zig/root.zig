@@ -19,27 +19,35 @@ pub export fn mainLoop() void {
 
     hal.init(&queue);
 
-    //Add our starter events
-    events.add_after_delay(&queue, processes.utility.ledOn, 0);
-    events.add_after_delay(&queue, processes.utility.read_outlet_temp, 1000 * 1000);
-    events.add_after_delay(&queue, processes.fan_control, 0);
-
     while (true) {
-        //The code is event-driven; if there are no events in the queue,
-        //none will ever be added and we have a deadlock.
-        const next_event = queue.removeOrNull() orelse {
-            hal.print("FATAL: empty queue!\n");
-            while (true) {}
-        };
-        const current_time = hal.get_time();
-        //Sleep until the next event is ready.
-        if (next_event.time > current_time) {
-            const dt = next_event.time - current_time;
-            hal.sleep(dt);
-        }
-
-        //We should now be at the right time, so run the event.
-        const callback: *const fn (queue: *EventQueue) void = @alignCast(@ptrCast(next_event.callback));
-        callback(&queue);
+        hal.print("Amp temp: ");
+        const tc_data: hal.TcData = hal.read_thermocouple(0);
+        hal.print_f32(@as(f32, @floatFromInt(tc_data.int_temp)) * 0.0625);
+        hal.print("\n");
+        hal.sleep(1000 * 1000);
     }
+
+    //Add our starter events
+    // events.add_after_delay(&queue, processes.utility.ledOn, 0);
+    // events.add_after_delay(&queue, processes.utility.read_outlet_temp, 1000 * 1000);
+    // events.add_after_delay(&queue, processes.fan_control, 0);
+
+    // while (true) {
+    //     //The code is event-driven; if there are no events in the queue,
+    //     //none will ever be added and we have a deadlock.
+    //     const next_event = queue.removeOrNull() orelse {
+    //         hal.print("FATAL: empty queue!\n");
+    //         while (true) {}
+    //     };
+    //     const current_time = hal.get_time();
+    //     //Sleep until the next event is ready.
+    //     if (next_event.time > current_time) {
+    //         const dt = next_event.time - current_time;
+    //         hal.sleep(dt);
+    //     }
+
+    //     //We should now be at the right time, so run the event.
+    //     const callback: *const fn (queue: *EventQueue) void = @alignCast(@ptrCast(next_event.callback));
+    //     callback(&queue);
+    // }
 }
