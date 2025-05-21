@@ -65,7 +65,7 @@ pub fn print_u64(val: u64) void {
 }
 
 pub fn print_f32(val: f32) void {
-    std.debug.print("{}", .{val});
+    std.debug.print("{d:.6}", .{val});
 }
 
 pub fn get_time() u64 {

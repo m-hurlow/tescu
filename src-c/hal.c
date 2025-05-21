@@ -33,7 +33,7 @@ void print_u64(uint64_t val) {
 }
 
 void print_f32(float val) {
-    printf("%.2f", val);
+    printf("%.6f", val);
 }
 
 uint64_t get_time() {

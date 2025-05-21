@@ -8,6 +8,6 @@
 
 #define PIN_TC_CS 1
 
-const uint MUX_SELS[6] = { 16, 17, 18, 12, 13, 19};
+static unsigned int MUX_SELS[6] = { 16, 17, 18, 12, 13, 19};
 
 #endif
