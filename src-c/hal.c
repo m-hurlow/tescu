@@ -9,6 +9,11 @@
 
 void init() {
     //TODO: initialise ESC
+
+    for (int i = 0; i < 6; i++) {
+        gpio_init(MUX_SELS[i]);
+        gpio_set_dir(MUX_SELS[i], GPIO_OUT);
+    }
 }
  
 void sleep(uint64_t time) {
@@ -36,6 +41,13 @@ uint64_t get_time() {
 }
 
 struct TcData read_thermocouple(uint8_t thermocouple) {
+    //Set the multiplexer select inputs
+    thermocouple &= 0x3f;
+    for (int i = 0; i < 6; i++) {
+        bool bit = ((thermocouple >> i) & 1) == 1;
+        gpio_put(MUX_SELS[i], bit);
+    }
+
     // Set CS low and wait for a small period
     gpio_put(PIN_TC_CS, 0);
     sleep_ms(1);
