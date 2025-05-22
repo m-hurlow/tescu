@@ -88,7 +88,7 @@ struct TcData read_thermocouple(uint8_t thermocouple) {
     return data;
 }
 
-uint16_t get_char() {
+int32_t get_char() {
     return stdio_getchar_timeout_us(0);
 }
 

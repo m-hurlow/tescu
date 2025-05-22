@@ -23,7 +23,7 @@ uint64_t get_time();
 
 struct TcData read_thermocouple(uint8_t thermocouple);
 
-uint16_t get_char();
+int32_t get_char();
 
 void set_fan_speed(uint16_t speed);
 

@@ -24,6 +24,7 @@ pub export fn mainLoop() void {
     // events.add_after_delay(&queue, processes.utility.read_outlet_temp, 1000 * 1000);
     events.add_after_delay(&queue, processes.fan_control, 1000 * 1000);
     events.add_after_delay(&queue, processes.report.send_report, 5000 * 1000);
+    events.add_after_delay(&queue, processes.ui, 0);
 
     while (true) {
         //The code is event-driven; if there are no events in the queue,

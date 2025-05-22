@@ -1,6 +1,7 @@
 const hal = @import("../hal.zig").hal;
 const events = @import("../events.zig");
 const EventQueue = events.EventQueue;
+const config = @import("config");
 
 var report = Report{
     .gas_temp = 0,
@@ -11,13 +12,13 @@ pub fn send_report(queue: *EventQueue) void {
     const time = hal.get_time();
 
     //Manually format the report as JSON
-    hal.print("!!report {{\"gas_temp\": ");
+    hal.print("!!report {\"gas_temp\": ");
     hal.print_f32(report.gas_temp);
     hal.print(", \"fan_speed\": ");
     hal.print_u64(report.fan_speed);
     hal.print(", \"timestamp_us\": ");
     hal.print_u64(time);
-    hal.print(" }}\n");
+    hal.print(" }\n");
 
     events.add_after_delay(queue, send_report, 1000 * 1000);
 }

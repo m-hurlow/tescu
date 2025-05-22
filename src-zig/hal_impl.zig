@@ -56,8 +56,8 @@ pub fn set_led(state: bool) void {
     std.debug.print("led {s}\n", .{if (state) "on" else "off"});
 }
 
-pub fn print(comptime msg: []const u8) void {
-    std.debug.print(msg, .{});
+pub fn print(msg: []const u8) void {
+    std.io.getStdOut().writeAll(msg) catch {};
 }
 
 pub fn print_u64(val: u64) void {
@@ -94,8 +94,9 @@ pub fn read_thermocouple(thermocouple: u8) TcData {
     return TcData{};
 }
 
-pub fn get_char() u16 {
-    return @intCast(@intFromEnum(rl.getKeyPressed()) + 32);
+pub fn get_char() i32 {
+    const char = rl.getCharPressed();
+    return if (char == 0) -2 else char;
 }
 
 pub fn set_fan_speed(speed: u16) void {
