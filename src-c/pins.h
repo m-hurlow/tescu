@@ -8,6 +8,8 @@
 
 #define PIN_TC_CS 1
 
+#define PIN_FAN_CTRL 14
+
 static unsigned int MUX_SELS[6] = { 16, 17, 18, 12, 13, 19};
 
 #endif

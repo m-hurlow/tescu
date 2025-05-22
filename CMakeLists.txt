@@ -62,6 +62,7 @@ target_link_libraries(tescu
         hardware_spi
         hardware_i2c
         hardware_timer
+        hardware_pwm
         )
 
 pico_add_extra_outputs(tescu)

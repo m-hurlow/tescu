@@ -2,14 +2,34 @@
 #include "hal.h"
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
+#include "hardware/pwm.h"
 
 #include "pins.h"
 
 #define todo(msg) print(msg); while (true) {};
 
-void init() {
-    //TODO: initialise ESC
+#define ESC_MAX_PWM 6547 //2 ms pulses
+#define ESC_MIN_PWM 3273 //1 ms pulses
 
+void init() {
+    gpio_set_function(PIN_FAN_CTRL, GPIO_FUNC_PWM);
+    uint slice_num = pwm_gpio_to_slice_num(PIN_FAN_CTRL);
+    uint channel = pwm_gpio_to_channel(PIN_FAN_CTRL);
+    //Set the frequency divider to 38.1875, yielding a frequency of 3.273 MHz
+    pwm_set_clkdiv_int_frac(slice_num, 38, 3); 
+    //This results in a required wrap value of 65466 for a 50 Hz PWM signal
+    pwm_set_wrap(slice_num, 65466);
+    //Arm the ESC by reducing the level gradually from max
+    pwm_set_chan_level(slice_num, channel, ESC_MAX_PWM);
+    pwm_set_enabled(slice_num, true);
+    printf("\nArming ESC... ");
+    for (int i = ESC_MAX_PWM; i > ESC_MIN_PWM; --i) {
+        pwm_set_chan_level(slice_num, channel, i);
+        sleep_us(500);
+    }
+    printf("Done\n");
+
+    //Set up the mux select GPIOs
     for (int i = 0; i < 6; i++) {
         gpio_init(MUX_SELS[i]);
         gpio_set_dir(MUX_SELS[i], GPIO_OUT);

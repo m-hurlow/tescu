@@ -8,11 +8,15 @@ var report = Report{
 };
 
 pub fn send_report(queue: *EventQueue) void {
+    const time = hal.get_time();
+
     //Manually format the report as JSON
     hal.print("!!report {{\"gas_temp\": ");
     hal.print_f32(report.gas_temp);
     hal.print(", \"fan_speed\": ");
     hal.print_u64(report.fan_speed);
+    hal.print(", \"timestamp_us\": ");
+    hal.print_u64(time);
     hal.print(" }}\n");
 
     events.add_after_delay(queue, send_report, 1000 * 1000);
