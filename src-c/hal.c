@@ -93,5 +93,8 @@ int32_t get_char() {
 }
 
 void set_fan_speed(uint16_t speed) {
-    //TODO: PWM control of ESC
+    //Scale 0-65536 to ESC_MIN_PWM-ESC_MAX_PWM
+    float speed_ratio = ((float)speed)/65536.0;
+    uint16_t scaled_speed = (uint16_t)(speed_ratio*(ESC_MAX_PWM-ESC_MIN_PWM)) + ESC_MIN_PWM;
+    pwm_set_gpio_level(PIN_FAN_CTRL, scaled_speed);
 }

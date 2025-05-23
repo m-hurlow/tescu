@@ -33,8 +33,11 @@ pub fn ui(queue: *EventQueue) void {
                     const val = std.fmt.parseInt(u16, buf[2..7], 10) catch fan_control.fan_speed;
                     fan_control.fan_speed = val;
                 }
+            } else if (std.mem.eql(u8, "stop", buf[0 .. buf_pos - 1])) {
+                hal.print("Stopping\n");
+                fan_control.auto = false;
+                fan_control.fan_speed = 0;
             }
-
             buf_pos = 0;
             break;
         } else {

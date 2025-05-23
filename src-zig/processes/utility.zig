@@ -25,3 +25,9 @@ pub fn get_tc_temp(tc_data: *const hal.TcData) f32 {
     const sign_extended: i16 = @bitCast((tc_data.tc_temp ^ sext_mask) -% sext_mask);
     return @as(f32, @floatFromInt(sign_extended)) * 0.25;
 }
+
+pub fn get_amp_temp(tc_data: *const hal.TcData) f32 {
+    const sext_mask = 1 << 11;
+    const sign_extended: i16 = @bitCast((tc_data.int_temp ^ sext_mask) -% sext_mask);
+    return @as(f32, @floatFromInt(sign_extended)) * 0.0625;
+}

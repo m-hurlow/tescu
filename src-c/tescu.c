@@ -27,8 +27,6 @@ int main()
     stdio_init_all();
 
     //Wait for a command before proceeding
-    sleep_ms(10000);
-    printf("Command: ");
     char command[256];
     scanf("%s", command);
     while (strcmp(command, "go")) {
